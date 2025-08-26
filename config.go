@@ -10,7 +10,9 @@ import (
 
 // Config represents the application configuration
 type Config struct {
-	ILO ILOConfig `yaml:"ilo" mapstructure:"ilo"`
+	BMCType BMCType     `yaml:"bmc_type" mapstructure:"bmc_type"`
+	ILO     ILOConfig   `yaml:"ilo" mapstructure:"ilo"`
+	IDRAC   IDRACConfig `yaml:"idrac" mapstructure:"idrac"`
 }
 
 // ILOConfig represents iLO connection configuration
@@ -22,23 +24,44 @@ type ILOConfig struct {
 	UseHTTPS bool   `yaml:"use_https" mapstructure:"use_https"`
 }
 
+// IDRACConfig represents iDRAC connection configuration
+type IDRACConfig struct {
+	Host     string `yaml:"host" mapstructure:"host"`
+	Username string `yaml:"username" mapstructure:"username"`
+	Password string `yaml:"password" mapstructure:"password"`
+	Port     int    `yaml:"port" mapstructure:"port"`
+	UseHTTPS bool   `yaml:"use_https" mapstructure:"use_https"`
+}
+
 var config Config
 
 func loadConfig() error {
 	// Set default values
+	viper.SetDefault("bmc_type", "ilo")
 	viper.SetDefault("ilo.port", 443)
 	viper.SetDefault("ilo.use_https", true)
+	viper.SetDefault("idrac.port", 443)
+	viper.SetDefault("idrac.use_https", true)
 
 	// Environment variable bindings
-	viper.SetEnvPrefix("ILO")
 	viper.AutomaticEnv()
 
-	// Bind specific environment variables
+	// Bind BMC type environment variable
+	viper.BindEnv("bmc_type", "BMC_TYPE")
+
+	// Bind iLO specific environment variables
 	viper.BindEnv("ilo.host", "ILO_HOST")
 	viper.BindEnv("ilo.username", "ILO_USERNAME")
 	viper.BindEnv("ilo.password", "ILO_PASSWORD")
 	viper.BindEnv("ilo.port", "ILO_PORT")
 	viper.BindEnv("ilo.use_https", "ILO_USE_HTTPS")
+
+	// Bind iDRAC specific environment variables
+	viper.BindEnv("idrac.host", "IDRAC_HOST")
+	viper.BindEnv("idrac.username", "IDRAC_USERNAME")
+	viper.BindEnv("idrac.password", "IDRAC_PASSWORD")
+	viper.BindEnv("idrac.port", "IDRAC_PORT")
+	viper.BindEnv("idrac.use_https", "IDRAC_USE_HTTPS")
 
 	// Configuration file handling
 	if cfgFile != "" {
@@ -74,25 +97,52 @@ func loadConfig() error {
 }
 
 func validateConfig() error {
-	if config.ILO.Host == "" {
-		return fmt.Errorf("iLO host is required (set ILO_HOST environment variable or host in config file)")
-	}
-	if config.ILO.Username == "" {
-		return fmt.Errorf("iLO username is required (set ILO_USERNAME environment variable or username in config file)")
-	}
-	if config.ILO.Password == "" {
-		return fmt.Errorf("iLO password is required (set ILO_PASSWORD environment variable or password in config file)")
+	switch config.BMCType {
+	case BMCTypeILO:
+		if config.ILO.Host == "" {
+			return fmt.Errorf("iLO host is required (set ILO_HOST environment variable or host in config file)")
+		}
+		if config.ILO.Username == "" {
+			return fmt.Errorf("iLO username is required (set ILO_USERNAME environment variable or username in config file)")
+		}
+		if config.ILO.Password == "" {
+			return fmt.Errorf("iLO password is required (set ILO_PASSWORD environment variable or password in config file)")
+		}
+	case BMCTypeIDRAC:
+		if config.IDRAC.Host == "" {
+			return fmt.Errorf("iDRAC host is required (set IDRAC_HOST environment variable or host in config file)")
+		}
+		if config.IDRAC.Username == "" {
+			return fmt.Errorf("iDRAC username is required (set IDRAC_USERNAME environment variable or username in config file)")
+		}
+		if config.IDRAC.Password == "" {
+			return fmt.Errorf("iDRAC password is required (set IDRAC_PASSWORD environment variable or password in config file)")
+		}
+	default:
+		return fmt.Errorf("unsupported BMC type: %s (supported types: ilo, idrac)", config.BMCType)
 	}
 	return nil
 }
 
 func createSampleConfig() error {
-	sampleConfig := `# iLO CLI Configuration File
+	sampleConfig := `# BMC CLI Configuration File
+# Specify the BMC type: 'ilo' for HPE iLO or 'idrac' for DELL iDRAC
+bmc_type: "ilo"
+
+# HPE iLO Configuration
 ilo:
   host: "192.168.1.100"          # iLO IP address or hostname
   username: "admin"              # iLO username
   password: "password"           # iLO password  
   port: 443                      # iLO port (default: 443)
+  use_https: true                # Use HTTPS (default: true)
+
+# DELL iDRAC Configuration
+idrac:
+  host: "192.168.1.101"          # iDRAC IP address or hostname
+  username: "root"               # iDRAC username
+  password: "calvin"             # iDRAC password
+  port: 443                      # iDRAC port (default: 443)
   use_https: true                # Use HTTPS (default: true)
 `
 
@@ -106,6 +156,30 @@ ilo:
 	}
 
 	fmt.Printf("Sample configuration file created at %s\n", configPath)
-	fmt.Println("Please edit the file with your iLO credentials and settings.")
+	fmt.Println("Please edit the file with your BMC credentials and settings.")
 	return nil
+}
+
+// NewBMCClient creates a BMC client based on the configuration
+func NewBMCClient() (BMCClient, error) {
+	switch config.BMCType {
+	case BMCTypeILO:
+		return NewILOClient(
+			config.ILO.Host,
+			config.ILO.Username,
+			config.ILO.Password,
+			config.ILO.Port,
+			config.ILO.UseHTTPS,
+		), nil
+	case BMCTypeIDRAC:
+		return NewIDRACClient(
+			config.IDRAC.Host,
+			config.IDRAC.Username,
+			config.IDRAC.Password,
+			config.IDRAC.Port,
+			config.IDRAC.UseHTTPS,
+		), nil
+	default:
+		return nil, fmt.Errorf("unsupported BMC type: %s", config.BMCType)
+	}
 }

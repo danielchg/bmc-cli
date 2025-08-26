@@ -14,14 +14,15 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "ilo-cli",
-	Short: "A CLI tool to manage iLO BMC operations",
-	Long: `ilo-cli is a command-line tool for managing HP iLO (Integrated Lights-Out) 
-Baseboard Management Controllers. It provides functionality to:
+	Use:   "bmc-cli",
+	Short: "A CLI tool to manage BMC operations",
+	Long: `bmc-cli is a command-line tool for managing Baseboard Management Controllers (BMCs)
+including HP iLO (Integrated Lights-Out) and DELL iDRAC systems. It provides functionality to:
 - Power on/off servers
 - Mount virtual media
 - Manage server configurations
 
+Supports both HPE iLO and DELL iDRAC BMCs via Redfish API.
 Configuration can be provided via YAML file or environment variables.`,
 }
 
@@ -39,7 +40,12 @@ func initConfig() {
 
 	if verbose {
 		log.SetOutput(os.Stdout)
-		fmt.Printf("Connected to iLO at %s:%d\n", config.ILO.Host, config.ILO.Port)
+		switch config.BMCType {
+		case BMCTypeILO:
+			fmt.Printf("Connected to iLO at %s:%d\n", config.ILO.Host, config.ILO.Port)
+		case BMCTypeIDRAC:
+			fmt.Printf("Connected to iDRAC at %s:%d\n", config.IDRAC.Host, config.IDRAC.Port)
+		}
 	}
 }
 

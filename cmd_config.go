@@ -9,19 +9,15 @@ import (
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configuration management commands",
-	Long:  `Commands for managing configuration files and settings`,
+	Long:  `Commands for managing BMC CLI configuration`,
 }
 
 var generateConfigCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate a sample configuration file",
-	Long: `Generate a sample YAML configuration file with all available options.
-This creates a config.yaml file in the current directory.`,
+	Long:  `Generate a sample configuration file with both iLO and iDRAC settings`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := createSampleConfig(); err != nil {
-			return fmt.Errorf("failed to generate config: %w", err)
-		}
-		return nil
+		return createSampleConfig()
 	},
 }
 

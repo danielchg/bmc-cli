@@ -1,7 +1,19 @@
-# iLO CLI Configuration File
-ilo:
-  host: "192.168.1.100"          # iLO IP address or hostname
-  username: "admin"              # iLO username
-  password: "password"           # iLO password  
-  port: 443                      # iLO port (default: 443)
+# BMC CLI Configuration File
+# Specify the BMC type: 'ilo' for HPE iLO or 'idrac' for DELL iDRAC
+bmc_type: "idrac"
+
+# HPE iLO Configuration
+# ilo:
+#   host: "192.168.1.100"          # iLO IP address or hostname
+#   username: "admin"              # iLO username
+#   password: "password"           # iLO password  
+#   port: 443                      # iLO port (default: 443)
+#   use_https: true                # Use HTTPS (default: true)
+
+# DELL iDRAC Configuration
+idrac:
+  host: "10.6.75.19"          # iDRAC IP address or hostname
+  username: "root"               # iDRAC username
+  password: "100Mgmt-"             # iDRAC password
+  port: 443                      # iDRAC port (default: 443)
   use_https: true                # Use HTTPS (default: true)

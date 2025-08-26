@@ -56,7 +56,7 @@ type VirtualMediaRequest struct {
 }
 
 // NewILOClient creates a new iLO client
-func NewILOClient(host, username, password string, port int, useHTTPS bool) *ILOClient {
+func NewILOClient(host, username, password string, port int, useHTTPS bool) BMCClient {
 	scheme := "http"
 	if useHTTPS {
 		scheme = "https"

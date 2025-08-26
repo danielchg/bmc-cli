@@ -17,21 +17,18 @@ var mountCmd = &cobra.Command{
 	Use:   "mount [image-url]",
 	Short: "Mount virtual media",
 	Long: `Mount an ISO image as virtual media. The image URL must be accessible 
-from the iLO BMC (typically an HTTP/HTTPS URL or network share).
+from the BMC (typically an HTTP/HTTPS URL or network share).
 
 Example:
-  ilo-cli virtualmedia mount http://192.168.1.100/images/ubuntu-20.04.iso`,
+  bmc-cli virtualmedia mount http://192.168.1.100/images/ubuntu-20.04.iso`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		imageURL := args[0]
 
-		client := NewILOClient(
-			config.ILO.Host,
-			config.ILO.Username,
-			config.ILO.Password,
-			config.ILO.Port,
-			config.ILO.UseHTTPS,
-		)
+		client, err := NewBMCClient()
+		if err != nil {
+			return fmt.Errorf("failed to create BMC client: %w", err)
+		}
 
 		fmt.Printf("Mounting virtual media: %s\n", imageURL)
 		if err := client.MountVirtualMedia(imageURL); err != nil {
@@ -48,13 +45,10 @@ var unmountCmd = &cobra.Command{
 	Short: "Unmount virtual media",
 	Long:  `Unmount all virtual media from the server`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := NewILOClient(
-			config.ILO.Host,
-			config.ILO.Username,
-			config.ILO.Password,
-			config.ILO.Port,
-			config.ILO.UseHTTPS,
-		)
+		client, err := NewBMCClient()
+		if err != nil {
+			return fmt.Errorf("failed to create BMC client: %w", err)
+		}
 
 		fmt.Println("Unmounting virtual media...")
 		if err := client.UnmountVirtualMedia(); err != nil {
@@ -71,13 +65,10 @@ var listMediaCmd = &cobra.Command{
 	Short: "List virtual media status",
 	Long:  `Lists all virtual media slots and their current status`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := NewILOClient(
-			config.ILO.Host,
-			config.ILO.Username,
-			config.ILO.Password,
-			config.ILO.Port,
-			config.ILO.UseHTTPS,
-		)
+		client, err := NewBMCClient()
+		if err != nil {
+			return fmt.Errorf("failed to create BMC client: %w", err)
+		}
 
 		fmt.Println("Retrieving virtual media information...")
 		vmList, err := client.GetVirtualMedia()

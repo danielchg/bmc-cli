@@ -15,15 +15,12 @@ var powerCmd = &cobra.Command{
 var powerOnCmd = &cobra.Command{
 	Use:   "on",
 	Short: "Power on the server",
-	Long:  `Powers on the server via iLO BMC`,
+	Long:  `Powers on the server via BMC (iLO or iDRAC)`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := NewILOClient(
-			config.ILO.Host,
-			config.ILO.Username,
-			config.ILO.Password,
-			config.ILO.Port,
-			config.ILO.UseHTTPS,
-		)
+		client, err := NewBMCClient()
+		if err != nil {
+			return fmt.Errorf("failed to create BMC client: %w", err)
+		}
 
 		fmt.Println("Powering on server...")
 		if err := client.SetPowerState(PowerStateOn); err != nil {
@@ -38,15 +35,12 @@ var powerOnCmd = &cobra.Command{
 var powerOffCmd = &cobra.Command{
 	Use:   "off",
 	Short: "Power off the server",
-	Long:  `Forces the server to power off via iLO BMC`,
+	Long:  `Forces the server to power off via BMC (iLO or iDRAC)`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := NewILOClient(
-			config.ILO.Host,
-			config.ILO.Username,
-			config.ILO.Password,
-			config.ILO.Port,
-			config.ILO.UseHTTPS,
-		)
+		client, err := NewBMCClient()
+		if err != nil {
+			return fmt.Errorf("failed to create BMC client: %w", err)
+		}
 
 		fmt.Println("Powering off server...")
 		if err := client.SetPowerState(PowerStateOff); err != nil {
@@ -63,13 +57,10 @@ var powerStatusCmd = &cobra.Command{
 	Short: "Check server power status",
 	Long:  `Retrieves the current power state and health status of the server`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := NewILOClient(
-			config.ILO.Host,
-			config.ILO.Username,
-			config.ILO.Password,
-			config.ILO.Port,
-			config.ILO.UseHTTPS,
-		)
+		client, err := NewBMCClient()
+		if err != nil {
+			return fmt.Errorf("failed to create BMC client: %w", err)
+		}
 
 		fmt.Println("Checking server status...")
 		systemInfo, err := client.GetSystemInfo()
