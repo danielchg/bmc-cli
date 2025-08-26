@@ -1,0 +1,21 @@
+# golangci-lint configuration file
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - gofmt
+    - goimports
+    - govet
+    - misspell
+    - ineffassign
+    - typecheck
+    - unused
+    - errcheck
+    - gosimple
+    - staticcheck
+    - gosec
+    - unconvert
+    - goconst
+    - gocyclo
+    - whitespace 

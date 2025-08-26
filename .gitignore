@@ -7,7 +7,12 @@
 bmc-cli
 bmc-cli_unix
 bmc-cli.exe
+bmc-cli-*
 ilo-cli
+
+# Release artifacts
+checksums.txt
+release_notes.txt
 
 # Test binary, built with `go test -c`
 *.test
