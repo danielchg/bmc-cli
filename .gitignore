@@ -5,6 +5,8 @@
 *.so
 *.dylib
 bmc-cli
+bmc-cli_unix
+bmc-cli.exe
 ilo-cli
 
 # Test binary, built with `go test -c`
@@ -12,6 +14,7 @@ ilo-cli
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+coverage.html
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
