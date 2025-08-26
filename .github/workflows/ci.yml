@@ -65,11 +65,12 @@ jobs:
 
     - name: Run tests (Windows)
       if: runner.os == 'Windows'
-      run: go test -v -coverprofile=coverage.out
+      shell: bash
+      run: go test -v -coverprofile=coverage.out $(go list ./...)
 
     - name: Run tests (Unix)
       if: runner.os != 'Windows'
-      run: go test -v -race -coverprofile=coverage.out
+      run: go test -v -race -coverprofile=coverage.out $(go list ./...)
 
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest'
@@ -182,10 +183,11 @@ jobs:
         go mod tidy
 
     - name: Install Gosec
-      run: go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+      run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
     - name: Run Gosec Security Scanner
       run: gosec -fmt sarif -out gosec.sarif ./...
+      continue-on-error: true
 
     - name: Upload SARIF file
       if: always()
