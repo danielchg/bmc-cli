@@ -57,7 +57,7 @@ jobs:
 
     - name: Clean coverage files (Windows)
       if: runner.os == 'Windows'
-      run: if exist coverage.out del coverage.out
+      run: if (Test-Path coverage.out) { Remove-Item coverage.out }
 
     - name: Clean coverage files (Unix)
       if: runner.os != 'Windows'
