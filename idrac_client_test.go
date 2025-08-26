@@ -31,7 +31,9 @@ func TestIDRACClient_GetSystemInfo(t *testing.T) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
+		if err := json.NewEncoder(w).Encode(mockResponse); err != nil {
+			t.Errorf("Failed to encode mock response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -168,11 +170,17 @@ func TestIDRACClient_GetVirtualMedia(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if r.URL.Path == "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia" {
-			json.NewEncoder(w).Encode(membersResponse)
+			if err := json.NewEncoder(w).Encode(membersResponse); err != nil {
+				t.Errorf("Failed to encode members response: %v", err)
+			}
 		} else if r.URL.Path == "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia/CD" {
-			json.NewEncoder(w).Encode(vmInfoCD)
+			if err := json.NewEncoder(w).Encode(vmInfoCD); err != nil {
+				t.Errorf("Failed to encode VM info CD: %v", err)
+			}
 		} else if r.URL.Path == "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia/RemovableDisk" {
-			json.NewEncoder(w).Encode(vmInfoDisk)
+			if err := json.NewEncoder(w).Encode(vmInfoDisk); err != nil {
+				t.Errorf("Failed to encode VM info disk: %v", err)
+			}
 		} else {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 			w.WriteHeader(http.StatusNotFound)
@@ -230,10 +238,14 @@ func TestIDRACClient_MountVirtualMedia(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if r.URL.Path == "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia" {
-			json.NewEncoder(w).Encode(membersResponse)
+			if err := json.NewEncoder(w).Encode(membersResponse); err != nil {
+				t.Errorf("Failed to encode members response: %v", err)
+			}
 		} else if r.URL.Path == "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia/CD" {
 			if r.Method == "GET" {
-				json.NewEncoder(w).Encode(vmInfo)
+				if err := json.NewEncoder(w).Encode(vmInfo); err != nil {
+					t.Errorf("Failed to encode VM info: %v", err)
+				}
 			} else if r.Method == "PATCH" {
 				requestCount++
 
@@ -303,10 +315,14 @@ func TestIDRACClient_UnmountVirtualMedia(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if r.URL.Path == "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia" {
-			json.NewEncoder(w).Encode(membersResponse)
+			if err := json.NewEncoder(w).Encode(membersResponse); err != nil {
+				t.Errorf("Failed to encode members response: %v", err)
+			}
 		} else if r.URL.Path == "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia/CD" {
 			if r.Method == "GET" {
-				json.NewEncoder(w).Encode(vmInfo)
+				if err := json.NewEncoder(w).Encode(vmInfo); err != nil {
+					t.Errorf("Failed to encode VM info: %v", err)
+				}
 			} else if r.Method == "PATCH" {
 				// Verify unmount request
 				var unmountRequest map[string]interface{}
@@ -344,7 +360,9 @@ func TestIDRACClient_ErrorHandling(t *testing.T) {
 	// Create test server that returns error
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("Unauthorized"))
+		if _, err := w.Write([]byte("Unauthorized")); err != nil {
+			t.Errorf("Failed to write error response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -396,9 +414,13 @@ func TestIDRACClient_NoVirtualMediaFound(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if r.URL.Path == "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia" {
-			json.NewEncoder(w).Encode(membersResponse)
+			if err := json.NewEncoder(w).Encode(membersResponse); err != nil {
+				t.Errorf("Failed to encode members response: %v", err)
+			}
 		} else if strings.HasPrefix(r.URL.Path, "/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia/") {
-			json.NewEncoder(w).Encode(vmInfo)
+			if err := json.NewEncoder(w).Encode(vmInfo); err != nil {
+				t.Errorf("Failed to encode VM info: %v", err)
+			}
 		}
 	}))
 	defer server.Close()

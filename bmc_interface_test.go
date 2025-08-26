@@ -15,9 +15,8 @@ func TestBMCInterface_ILOClient(t *testing.T) {
 
 	// This should compile without errors if ILOClient implements BMCClient
 	client = iloClient
-	if client == nil {
-		t.Error("ILOClient should implement BMCClient interface")
-	}
+	// Test that the assignment worked and we can use interface methods
+	_ = client // This assignment proves the interface is implemented
 }
 
 func TestBMCInterface_IDRACClient(t *testing.T) {
@@ -31,9 +30,8 @@ func TestBMCInterface_IDRACClient(t *testing.T) {
 
 	// This should compile without errors if IDRACClient implements BMCClient
 	client = idracClient
-	if client == nil {
-		t.Error("IDRACClient should implement BMCClient interface")
-	}
+	// Test that the assignment worked and we can use interface methods
+	_ = client // This assignment proves the interface is implemented
 }
 
 func TestBMCTypes(t *testing.T) {

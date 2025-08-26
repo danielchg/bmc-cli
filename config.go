@@ -47,21 +47,21 @@ func loadConfig() error {
 	viper.AutomaticEnv()
 
 	// Bind BMC type environment variable
-	viper.BindEnv("bmc_type", "BMC_TYPE")
+	_ = viper.BindEnv("bmc_type", "BMC_TYPE")
 
 	// Bind iLO specific environment variables
-	viper.BindEnv("ilo.host", "ILO_HOST")
-	viper.BindEnv("ilo.username", "ILO_USERNAME")
-	viper.BindEnv("ilo.password", "ILO_PASSWORD")
-	viper.BindEnv("ilo.port", "ILO_PORT")
-	viper.BindEnv("ilo.use_https", "ILO_USE_HTTPS")
+	_ = viper.BindEnv("ilo.host", "ILO_HOST")
+	_ = viper.BindEnv("ilo.username", "ILO_USERNAME")
+	_ = viper.BindEnv("ilo.password", "ILO_PASSWORD")
+	_ = viper.BindEnv("ilo.port", "ILO_PORT")
+	_ = viper.BindEnv("ilo.use_https", "ILO_USE_HTTPS")
 
 	// Bind iDRAC specific environment variables
-	viper.BindEnv("idrac.host", "IDRAC_HOST")
-	viper.BindEnv("idrac.username", "IDRAC_USERNAME")
-	viper.BindEnv("idrac.password", "IDRAC_PASSWORD")
-	viper.BindEnv("idrac.port", "IDRAC_PORT")
-	viper.BindEnv("idrac.use_https", "IDRAC_USE_HTTPS")
+	_ = viper.BindEnv("idrac.host", "IDRAC_HOST")
+	_ = viper.BindEnv("idrac.username", "IDRAC_USERNAME")
+	_ = viper.BindEnv("idrac.password", "IDRAC_PASSWORD")
+	_ = viper.BindEnv("idrac.port", "IDRAC_PORT")
+	_ = viper.BindEnv("idrac.use_https", "IDRAC_USE_HTTPS")
 
 	// Configuration file handling
 	if cfgFile != "" {

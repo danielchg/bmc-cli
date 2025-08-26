@@ -31,7 +31,9 @@ func TestILOClient_GetSystemInfo(t *testing.T) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
+		if err := json.NewEncoder(w).Encode(mockResponse); err != nil {
+			t.Errorf("Failed to encode mock response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -160,9 +162,13 @@ func TestILOClient_GetVirtualMedia(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if r.URL.Path == "/redfish/v1/Managers/1/VirtualMedia" {
-			json.NewEncoder(w).Encode(membersResponse)
+			if err := json.NewEncoder(w).Encode(membersResponse); err != nil {
+				t.Errorf("Failed to encode members response: %v", err)
+			}
 		} else if strings.HasPrefix(r.URL.Path, "/redfish/v1/Managers/1/VirtualMedia/") {
-			json.NewEncoder(w).Encode(vmInfo)
+			if err := json.NewEncoder(w).Encode(vmInfo); err != nil {
+				t.Errorf("Failed to encode VM info: %v", err)
+			}
 		} else {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 			w.WriteHeader(http.StatusNotFound)
@@ -218,10 +224,14 @@ func TestILOClient_MountVirtualMedia(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if r.URL.Path == "/redfish/v1/Managers/1/VirtualMedia" {
-			json.NewEncoder(w).Encode(membersResponse)
+			if err := json.NewEncoder(w).Encode(membersResponse); err != nil {
+				t.Errorf("Failed to encode members response: %v", err)
+			}
 		} else if r.URL.Path == "/redfish/v1/Managers/1/VirtualMedia/1" {
 			if r.Method == "GET" {
-				json.NewEncoder(w).Encode(vmInfo)
+				if err := json.NewEncoder(w).Encode(vmInfo); err != nil {
+					t.Errorf("Failed to encode VM info: %v", err)
+				}
 			} else if r.Method == "PATCH" {
 				// Verify mount request
 				var mountRequest VirtualMediaRequest
@@ -262,7 +272,9 @@ func TestILOClient_ErrorHandling(t *testing.T) {
 	// Create test server that returns error
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Internal Server Error"))
+		if _, err := w.Write([]byte("Internal Server Error")); err != nil {
+			t.Errorf("Failed to write error response: %v", err)
+		}
 	}))
 	defer server.Close()
 
