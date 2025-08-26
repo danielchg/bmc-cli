@@ -1,0 +1,7 @@
+# iLO CLI Configuration File
+ilo:
+  host: "192.168.1.100"          # iLO IP address or hostname
+  username: "admin"              # iLO username
+  password: "password"           # iLO password  
+  port: 443                      # iLO port (default: 443)
+  use_https: true                # Use HTTPS (default: true)
