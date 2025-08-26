@@ -23,6 +23,11 @@ jobs:
       with:
         go-version: 1.21
 
+    - name: Download and tidy dependencies
+      run: |
+        go mod download
+        go mod tidy
+        
     - name: Run tests
       run: go test -v ./...
 

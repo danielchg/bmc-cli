@@ -30,18 +30,36 @@ jobs:
         path: |
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
         restore-keys: |
+          ${{ runner.os }}-go-${{ matrix.go-version }}-
           ${{ runner.os }}-go-
 
-    - name: Download dependencies
-      run: go mod download
-
+    - name: Debug Go environment
+      run: |
+        go version
+        go env GOPATH
+        go env GOCACHE
+        go env GOMODCACHE
+        
+    - name: Download and tidy dependencies
+      run: |
+        echo "Downloading dependencies..."
+        go mod download -x
+        echo "Tidying dependencies..."
+        go mod tidy -v
+        echo "Dependencies ready"
+        
     - name: Verify dependencies
-      run: go mod verify
+      run: |
+        echo "Verifying dependencies..."
+        go mod verify
+        echo "Verification complete"
 
     - name: Run tests
-      run: go test -v -race -coverprofile=coverage.out ./...
+      run: |
+        echo "Running tests..."
+        go test -v -race -coverprofile=coverage.out ./...
 
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.21'
@@ -63,8 +81,10 @@ jobs:
       with:
         go-version: 1.21
 
-    - name: Download dependencies
-      run: go mod download
+    - name: Download and tidy dependencies
+      run: |
+        go mod download
+        go mod tidy
 
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v3
@@ -146,8 +166,10 @@ jobs:
       with:
         go-version: 1.21
 
-    - name: Download dependencies
-      run: go mod download
+    - name: Download and tidy dependencies
+      run: |
+        go mod download
+        go mod tidy
 
     - name: Install Gosec
       run: go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest

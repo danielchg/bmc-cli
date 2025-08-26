@@ -8,6 +8,7 @@ bmc-cli
 bmc-cli_unix
 bmc-cli.exe
 bmc-cli-*
+bmc-cli-test
 ilo-cli
 
 # Release artifacts
