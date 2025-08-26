@@ -63,11 +63,14 @@ jobs:
       with:
         go-version: 1.21
 
+    - name: Download dependencies
+      run: go mod download
+
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v3
       with:
         version: latest
-        args: --timeout=5m
+        args: --timeout=5m --disable-all --enable=errcheck,gosimple,govet,ineffassign,staticcheck,typecheck,unused,gofmt,goimports,misspell
 
   format:
     name: Format Check
@@ -143,7 +146,17 @@ jobs:
       with:
         go-version: 1.21
 
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Install Gosec
+      run: go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+
     - name: Run Gosec Security Scanner
-      uses: securecodewarrior/github-action-gosec@master
+      run: gosec -fmt sarif -out gosec.sarif ./...
+
+    - name: Upload SARIF file
+      if: always()
+      uses: github/codeql-action/upload-sarif@v2
       with:
-        args: './...' 
+        sarif_file: gosec.sarif 

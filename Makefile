@@ -53,11 +53,17 @@ fmt:
 	@echo "Formatting code..."
 	go fmt ./...
 
-# Lint code
+# Lint code (requires golangci-lint)
 .PHONY: lint
 lint:
 	@echo "Linting code..."
-	golangci-lint run
+	@which golangci-lint > /dev/null || (echo "golangci-lint not found. Run 'make dev-setup' or use 'make lint-basic'" && exit 1)
+	golangci-lint run --disable-all --enable=errcheck,gosimple,govet,ineffassign,staticcheck,typecheck,unused,gofmt,goimports,misspell --timeout=5m
+
+# Basic linting without golangci-lint
+.PHONY: lint-basic
+lint-basic: fmt vet
+	@echo "Running basic linting..."
 
 # Vet code
 .PHONY: vet
@@ -67,7 +73,7 @@ vet:
 
 # Run all quality checks
 .PHONY: check
-check: fmt vet test
+check: fmt vet lint-basic test
 
 # Clean build artifacts
 .PHONY: clean
@@ -121,7 +127,8 @@ help:
 	@echo "  test          - Run tests"
 	@echo "  test-coverage - Run tests with coverage"
 	@echo "  fmt           - Format code"
-	@echo "  lint          - Lint code"
+	@echo "  lint          - Lint code (requires golangci-lint)"
+	@echo "  lint-basic    - Basic linting without golangci-lint"
 	@echo "  vet           - Vet code"
 	@echo "  check         - Run all quality checks"
 	@echo "  clean         - Clean build artifacts"

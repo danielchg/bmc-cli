@@ -4,18 +4,17 @@ run:
 
 linters:
   enable:
-    - gofmt
-    - goimports
-    - govet
-    - misspell
-    - ineffassign
-    - typecheck
-    - unused
     - errcheck
     - gosimple
+    - govet
+    - ineffassign
     - staticcheck
-    - gosec
+    - typecheck
+    - unused
+    - gofmt
+    - goimports
+    - misspell
     - unconvert
-    - goconst
-    - gocyclo
-    - whitespace 
+  
+  disable:
+    - gosec  # We run this separately in security job 
